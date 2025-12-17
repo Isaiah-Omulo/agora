@@ -21,25 +21,39 @@ def health():
 def token():
     app = flask.current_app
     req = flask.request
-    app.logger.info('recv gen-token req from {}'.format(req.remote_addr))
+    app.logger.info('recv gen-token req from %s', req.remote_addr)
 
     query_info = req.args
-    if 'channel_name' not in query_info:
-        flask.abort(400)
 
-    app_id = flask.current_app.config['APP_ID']
-    app_certificate = flask.current_app.config['APP_CERTIFICATE']
-    uid = 0
+    # Validate required params
+    if 'channel_name' not in query_info or 'user_id' not in query_info:
+        return {"error": "channel_name and user_id are required"}, 400
+
     channel_name = query_info['channel_name']
-    expiration_in_seconds = 12 * 60 * 60
+    user_id = query_info['user_id']  # Firebase UID (string)
 
-    access_token2 = ''
+    app_id = app.config['APP_ID']
+    app_certificate = app.config['APP_CERTIFICATE']
+    expiration_in_seconds = 12 * 60 * 60  # 12 hours
+
     try:
-        access_token2 = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name,
-                                                             uid, Role_Publisher, expiration_in_seconds)
+        token = RtcTokenBuilder.build_token_with_user_account(
+            app_id,
+            app_certificate,
+            channel_name,
+            user_id,
+            Role_Publisher,
+            expiration_in_seconds
+        )
     except Exception as e:
-        app.logger.info(repr(e))
-        flask.abort(500)
-    app.logger.info('token {}'.format(access_token2))
-    return access_token2
+        app.logger.exception("Token generation failed")
+        return {"error": "token generation failed"}, 500
+
+    return {
+        "token": token,
+        "channel_name": channel_name,
+        "user_id": user_id,
+        "expires_in": expiration_in_seconds
+    }, 200
+
 
