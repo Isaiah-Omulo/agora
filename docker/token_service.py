@@ -24,7 +24,7 @@ def token():
     app_certificate = flask.current_app.config['APP_CERTIFICATE']
     uid = 0
     channel_name = query_info['channel_name']
-    expiration_in_seconds = 60 * 15
+    expiration_in_seconds = 12 * 60 * 60
 
     access_token2 = ''
     try:
