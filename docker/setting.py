@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
-
+import os
 
 class BaseConfig(object):
     ENV = 'production'
     DEBUG = False
     TESTING = False
 
-    APP_ID = ''
-    APP_CERTIFICATE = ''
-
+    APP_ID = os.environ.get("AGORA_APP_ID")
+    APP_CERTIFICATE = os.environ.get("AGORA_APP_CERTIFICATE")
