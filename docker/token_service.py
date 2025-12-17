@@ -9,6 +9,13 @@ from src.RtcTokenBuilder2 import *
 
 bp = flask.Blueprint('token_app', __name__)
 
+@bp.route('/health', methods=('GET',))
+def health():
+    return {
+        "status": "ok",
+        "service": "agora-token-service"
+    }, 200
+
 
 @bp.route('/v1/token', methods=('GET',))
 def token():
